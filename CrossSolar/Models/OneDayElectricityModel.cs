@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossSolar.Domain
+namespace CrossSolar.Models
 {
     public class OneDayElectricityModel
     {

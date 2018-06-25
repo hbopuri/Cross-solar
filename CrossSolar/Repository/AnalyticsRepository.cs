@@ -6,7 +6,7 @@ namespace CrossSolar.Repository
     {
         public AnalyticsRepository(CrossSolarDbContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
         }
     }
 }

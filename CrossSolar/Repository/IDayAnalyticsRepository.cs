@@ -1,4 +1,5 @@
 ﻿using CrossSolar.Domain;
+using CrossSolar.Models;
 
 namespace CrossSolar.Repository
 {

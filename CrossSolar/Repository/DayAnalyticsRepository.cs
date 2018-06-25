@@ -1,4 +1,5 @@
 using CrossSolar.Domain;
+using CrossSolar.Models;
 
 namespace CrossSolar.Repository
 {
@@ -6,7 +7,7 @@ namespace CrossSolar.Repository
     {
         public DayAnalyticsRepository(CrossSolarDbContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
         }
     }
 }

@@ -17,17 +17,17 @@ namespace CrossSolar.Controllers
         }
 
         // POST api/panel
-        [HttpPost]
-        public async Task<IActionResult> Register([FromBody] PanelModel value)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] PanelModel item)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var panel = new Panel
             {
-                Latitude = value.Latitude,
-                Longitude = value.Longitude,
-                Serial = value.Serial,
-                Brand = value.Brand
+                Latitude = item.Latitude,
+                Longitude = item.Longitude,
+                Serial = item.Serial,
+                Brand = item.Brand
             };
 
             await _panelRepository.InsertAsync(panel);

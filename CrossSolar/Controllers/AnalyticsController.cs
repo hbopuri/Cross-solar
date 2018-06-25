@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CrossSolar.Domain;
 using CrossSolar.Models;
 using CrossSolar.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CrossSolar.Controllers
 {
@@ -24,16 +22,16 @@ namespace CrossSolar.Controllers
         }
 
         // GET panel/XXXX1111YYYY2222/analytics
-        [HttpGet("{banelId}/[controller]")]
-        public async Task<IActionResult> Get([FromRoute] string panelId)
+        [HttpGet("{panelId}/[controller]")]
+        public async Task<IActionResult> Get([FromRoute] int panelId)
         {
-            var panel = await _panelRepository.Query()
-                .FirstOrDefaultAsync(x => x.Serial.Equals(panelId, StringComparison.CurrentCultureIgnoreCase));
+            var panel = await _panelRepository.FindAsync(x =>
+                x.Id.Equals(panelId));
 
             if (panel == null) return NotFound();
 
-            var analytics = await _analyticsRepository.Query()
-                .Where(x => x.PanelId.Equals(panelId, StringComparison.CurrentCultureIgnoreCase)).ToListAsync();
+            var analytics = await _analyticsRepository
+                .FindAllAsync(x => x.PanelId.Equals(panelId));
 
             var result = new OneHourElectricityListModel
             {
@@ -50,16 +48,28 @@ namespace CrossSolar.Controllers
 
         // GET panel/XXXX1111YYYY2222/analytics/day
         [HttpGet("{panelId}/[controller]/day")]
-        public async Task<IActionResult> DayResults([FromRoute] string panelId)
+        public async Task<IActionResult> DayResults([FromRoute] int panelId)
         {
-            var result = new List<OneDayElectricityModel>();
-
+            var analytics = await _analyticsRepository
+                .FindAllAsync(x => x.PanelId == panelId);
+            if (analytics == null)
+            {
+                return Ok();
+            }
+            var result = analytics.GroupBy(x => x.DateTime.Date).Select(x => new
+            {
+                Date = x.Key.ToString("d"),
+                Sum = x.Sum(v => v.KiloWatt),
+                Min = x.Min(v => v.KiloWatt),
+                Max = x.Max(v => v.KiloWatt),
+                Average = x.Select(v => v.KiloWatt).Average()
+            });
             return Ok(result);
         }
 
         // POST panel/XXXX1111YYYY2222/analytics
         [HttpPost("{panelId}/[controller]")]
-        public async Task<IActionResult> Post([FromRoute] string panelId, [FromBody] OneHourElectricityModel value)
+        public async Task<IActionResult> Post([FromRoute] int panelId, [FromBody] OneHourElectricityModel value)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 

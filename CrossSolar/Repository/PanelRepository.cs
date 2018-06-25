@@ -6,7 +6,7 @@ namespace CrossSolar.Repository
     {
         public PanelRepository(CrossSolarDbContext dbContext)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
         }
     }
 }
